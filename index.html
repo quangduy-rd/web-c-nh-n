@@ -44,20 +44,26 @@
       margin: 30px 0 20px;
     }
 
-    /* Khu vực mockup */
-    .mockup-container {
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
+   /* Khu vực mockup */
+.mockup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;   /* canh giữa theo chiều dọc */
+  width: 100vw;          /* full ngang */
+  height: 100vh;         /* full cao */
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
 
-    .mockup-container iframe {
-      width: 90%;
-      height: 600px;
-      border: none;
-      background: white;
-      box-shadow: 0 0 8px rgba(0,0,0,0.2);
-    }
+.mockup-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
   </style>
 </head>
 <body>
@@ -89,4 +95,5 @@
 
 </body>
 </html>
+
 
