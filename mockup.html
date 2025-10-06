@@ -10,8 +10,8 @@
   <link rel="preload" href="UTMAndrogyne.woff2.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="UTMZirkon.woff2.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="UVFAphroditePro.woff2.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="UVFCandlescriptPro.woff2" as="font" type="font/wof2" crossorigin>
-
+  <link rel="preload" href="UVFCandlescriptPro.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="UVFCandlescriptPro.woff" as="font" type="font/woff" crossorigin>
   <style>
     body {
       margin: 0;
@@ -81,7 +81,16 @@
     @font-face { font-family: "UTMAndrogyne"; src: url("UTMAndrogyne.woff2.ttf") format("truetype"); font-display: swap; }
     @font-face { font-family: "UTMZirkon"; src: url("UTMZirkon.woff2.ttf") format("truetype"); font-display: swap; }
     @font-face { font-family: "UVFAphroditePro"; src: url("UVFAphroditePro.woff2.ttf") format("truetype"); font-display: swap; }
-    @font-face { font-family: 'UVF Candlescript Pro'; src: url('fonts/UVFCandlescriptPro.woff2') format('woff2'); font-weight: normal; font-style: normal;
+@font-face {
+  font-family: 'UVF Candlescript Pro';
+  src: url('fonts/UVFCandlescriptPro.woff2') format('woff2'),
+       url('fonts/UVFCandlescriptPro.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
   </style>
 </head>
 <body>
@@ -107,7 +116,7 @@
         <option value="UTMAndrogyne">UTM Androgyne</option>
         <option value="UTMZirkon">UTM Zirkon</option>
         <option value="UVFAphroditePro">UVF Aphrodite Pro</option>
-         <option value="'UVF Candlescript Pro'">UVF Candlescript Pro</option>
+        <option value="UVF Candlescript Pro">UVF Candlescript Pro</option> 
       </select>
       <input type="color" id="colorPicker" value="#000000">
       <button id="btnAddText">Thêm chữ</button>
@@ -290,6 +299,7 @@
   </script>
 </body>
 </html>
+
 
 
 
