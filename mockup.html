@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mockup Editor</title>
+
+  <!-- ✅ Preload font để tránh delay khi chọn -->
+  <link rel="preload" href="DancingScript.woff2.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="RosellindaAlyamore.woff2.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="UTMAndrogyne.woff2.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="UTMZirkon.woff2.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="UVFAphroditePro.woff2.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="UVFCandlescriptPro.woff2.otf" as="font" type="font/otf" crossorigin>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #leftPanel, #rightPanel {
+      width: 180px;
+      background: #f8f8f8;
+      overflow-y: auto;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+    }
+    #rightPanel { border-left: 1px solid #ccc; border-right: none; }
+    #leftPanel h3, #rightPanel h3 { text-align: center; margin: 10px 0; }
+    #leftPanel img, #rightPanel img {
+      width: 100%;
+      margin-bottom: 10px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: 0.2s;
+    }
+    #leftPanel img:hover, #rightPanel img:hover { border: 1px solid #007bff; }
+
+    #centerPanel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #eee;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    #canvasWrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+    #mockupCanvas {
+      background: #fff;
+      max-height: 100%;
+      max-width: 100%;
+      border: 1px solid #ccc;
+    }
+    #toolbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      padding: 8px;
+      border-top: 1px solid #ccc;
+      background: #f9f9f9;
+      flex-wrap: wrap;
+    }
+    #toolbar input, #toolbar select, #toolbar button { padding: 4px 6px; font-size: 14px; }
+    #zoomControls button { padding: 4px 8px; }
+
+    /* ✅ Font-face cài sẵn cho Live Server / GitHub */
+    @font-face { font-family: "DancingScript"; src: url("DancingScript.woff2.ttf") format("truetype"); font-display: swap; }
+    @font-face { font-family: "RosellindaAlyamore"; src: url("RosellindaAlyamore.woff2.otf") format("opentype"); font-display: swap; }
+    @font-face { font-family: "UTMAndrogyne"; src: url("UTMAndrogyne.woff2.ttf") format("truetype"); font-display: swap; }
+    @font-face { font-family: "UTMZirkon"; src: url("UTMZirkon.woff2.ttf") format("truetype"); font-display: swap; }
+    @font-face { font-family: "UVFAphroditePro"; src: url("UVFAphroditePro.woff2.ttf") format("truetype"); font-display: swap; }
+    @font-face { font-family: "UVFCandlescriptPro"; src: url("UVFCandlescriptPro.woff2.otf") format("opentype"); font-display: swap; }
+  </style>
+</head>
+<body>
+  <div id="leftPanel">
+    <h3>Hình mẫu</h3>
+    <input type="file" id="uploadLogos" multiple accept="image/*"><br><br>
+    <div id="logoList"></div>
+  </div>
+
+  <div id="centerPanel">
+    <div id="canvasWrapper">
+      <canvas id="mockupCanvas"></canvas>
+    </div>
+    <div id="toolbar">
+      <input type="text" id="textInput" placeholder="Thêm chữ vào đây">
+      <select id="fontSelect">
+        <option value="Arial">Arial</option>
+        <option value="Tahoma">Tahoma</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Verdana">Verdana</option>
+        <option value="DancingScript">Dancing Script</option>
+        <option value="RosellindaAlyamore">Rosellinda Alyamore</option>
+        <option value="UTMAndrogyne">UTM Androgyne</option>
+        <option value="UTMZirkon">UTM Zirkon</option>
+        <option value="UVFAphroditePro">UVF Aphrodite Pro</option>
+        <option value="UVFCandlescriptPro">UVF Candlescript Pro</option>
+      </select>
+      <input type="color" id="colorPicker" value="#000000">
+      <button id="btnAddText">Thêm chữ</button>
+      <button id="btnDelete">Xóa</button>
+      <button id="btnUndo">Quay lại</button>
+      <button id="btnExportJPG">Lưu JPG</button>
+      <button id="btnExportPNG">Lưu PNG</button>
+      <div id="zoomControls">
+        <button id="btnZoomOut">➖</button>
+        <button id="btnZoomIn">➕</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rightPanel">
+    <h3>Bình mẫu</h3>
+    <input type="file" id="uploadMockups" multiple accept="image/*"><br><br>
+    <div id="mockupList"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+  <script>
+    const canvas = new fabric.Canvas('mockupCanvas', { selection: true, preserveObjectStacking: true });
+    const wrapper = document.getElementById('canvasWrapper');
+    let currentMockup = null;
+    let currentImage = null;
+    let history = [];
+    let scaleFactor = 1;
+
+    function resizeCanvas(){ 
+      canvas.setWidth(wrapper.clientWidth); 
+      canvas.setHeight(wrapper.clientHeight); 
+      canvas.renderAll(); 
+    }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+    function zoom(delta){ 
+      scaleFactor += delta; 
+      if(scaleFactor<0.2) scaleFactor=0.2; 
+      if(scaleFactor>3) scaleFactor=3; 
+      canvas.setZoom(scaleFactor); 
+      canvas.requestRenderAll(); 
+    }
+
+    document.getElementById('uploadLogos').addEventListener('change', function(e){
+      const list=document.getElementById('logoList'); list.innerHTML='';
+      [...e.target.files].forEach(file=>{
+        const r=new FileReader(); 
+        r.onload=ev=>{
+          const im=document.createElement('img'); 
+          im.src=ev.target.result; 
+          im.addEventListener('click',()=>addImage(ev.target.result)); 
+          list.appendChild(im);
+        }; 
+        r.readAsDataURL(file);
+      });
+    });
+
+    document.getElementById('uploadMockups').addEventListener('change', function(e){
+      const list=document.getElementById('mockupList'); list.innerHTML='';
+      [...e.target.files].forEach(file=>{
+        const r=new FileReader(); 
+        r.onload=ev=>{
+          const im=document.createElement('img'); 
+          im.src=ev.target.result; 
+          im.addEventListener('click',()=>setMockup(ev.target.result)); 
+          list.appendChild(im);
+        }; 
+        r.readAsDataURL(file);
+      });
+    });
+
+    function setMockup(src){
+      fabric.Image.fromURL(src,function(img){
+        if(currentMockup) canvas.remove(currentMockup);
+        currentMockup=img;
+        img.selectable=false; img.evented=false; img.isMockup=true;
+        const scale=Math.min(canvas.width/img.width, canvas.height/img.height);
+        img.scale(scale); 
+        img.set({left:canvas.width/2,top:canvas.height/2,originX:'center',originY:'center'});
+        canvas.add(img); img.sendToBack();
+        canvas.renderAll(); saveHistory();
+      });
+    }
+
+    function addImage(src){
+      fabric.Image.fromURL(src,function(img){
+        if(currentImage) canvas.remove(currentImage);
+        img.scale(0.3); 
+        img.set({left:canvas.width/2, top:canvas.height/2, originX:'center', originY:'center'});
+        img.selectable=true; img.hasControls=true; 
+        canvas.add(img).setActiveObject(img); 
+        currentImage=img; 
+        canvas.renderAll(); saveHistory();
+      });
+    }
+
+    function addText(){
+      const tbox=new fabric.Textbox(document.getElementById('textInput').value||'Nhập chữ ở đây',{
+        left:canvas.width/2, top:canvas.height/2, 
+        fontFamily:document.getElementById('fontSelect').value,
+        fill:document.getElementById('colorPicker').value, 
+        fontSize:24, originX:'center', originY:'center'
+      });
+      canvas.add(tbox).setActiveObject(tbox); 
+      canvas.renderAll(); 
+      saveHistory();
+    }
+
+    function deleteSelected(){
+      const a=canvas.getActiveObject(); 
+      if(a && !a.isMockup){ 
+        if(a===currentImage) currentImage=null; 
+        canvas.remove(a); saveHistory(); 
+      }
+    }
+
+    function saveHistory(){ history.push(JSON.stringify(canvas.toJSON())); }
+    function undo(){ 
+      if(history.length>1){ 
+        history.pop(); 
+        canvas.loadFromJSON(history[history.length-1], ()=>{ 
+          currentMockup=canvas.getObjects().find(o=>o.isMockup)||null; 
+          currentImage=canvas.getObjects().find(o=>o!==currentMockup && o.type==="image")||null;
+          canvas.renderAll(); 
+        }); 
+      }
+    }
+
+    function exportMockup(type){
+      const url=canvas.toDataURL({format:type, quality:1}); 
+      const a=document.createElement('a'); 
+      a.href=url; 
+      a.download='mockup.'+type; 
+      a.click();
+    }
+
+    function updateToolbarFromSelection(obj){
+      if(obj && obj.type==="textbox"){
+        document.getElementById('fontSelect').value=obj.fontFamily||"Arial";
+        document.getElementById('colorPicker').value=obj.fill||"#000000";
+        document.getElementById('textInput').value=obj.text||"";
+      }
+    }
+    canvas.on('selection:created', e=>updateToolbarFromSelection(e.selected[0]));
+    canvas.on('selection:updated', e=>updateToolbarFromSelection(e.selected[0]));
+
+    // ✅ Thay font/màu/chữ realtime
+    document.getElementById('fontSelect').addEventListener('change', ()=>{ 
+      const obj = canvas.getActiveObject();
+      if(obj && obj.type==="textbox"){ 
+        obj.set("fontFamily", document.getElementById('fontSelect').value); 
+        canvas.renderAll(); saveHistory(); 
+      }
+    });
+    document.getElementById('colorPicker').addEventListener('input', ()=>{ 
+      const obj = canvas.getActiveObject();
+      if(obj && obj.type==="textbox"){ 
+        obj.set("fill", document.getElementById('colorPicker').value); 
+        canvas.renderAll(); saveHistory(); 
+      }
+    });
+    document.getElementById('textInput').addEventListener('input', ()=>{ 
+      const obj = canvas.getActiveObject();
+      if(obj && obj.type==="textbox"){ 
+        obj.set("text", document.getElementById('textInput').value); 
+        canvas.renderAll(); saveHistory(); 
+      }
+    });
+
+    document.getElementById('btnAddText').onclick=addText;
+    document.getElementById('btnDelete').onclick=deleteSelected;
+    document.getElementById('btnUndo').onclick=undo;
+    document.getElementById('btnExportJPG').onclick=()=>exportMockup('jpg');
+    document.getElementById('btnExportPNG').onclick=()=>exportMockup('png');
+    document.getElementById('btnZoomIn').onclick=()=>zoom(0.1);
+    document.getElementById('btnZoomOut').onclick=()=>zoom(-0.1);
+
+    window.addEventListener('load', resizeCanvas);
+  </script>
+</body>
+</html>
