@@ -10,15 +10,14 @@
       background: #f5f5f5;
     }
 
-   .header {
-  background: linear-gradient(to right, #00c6ff, #0052d4); /* xanh nhạt sang xanh đậm */
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 30px;
-}
-
+    .header {
+      background: linear-gradient(to right, #00c6ff, #0052d4);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+    }
 
     .header .logo {
       max-height: 50px;
@@ -37,65 +36,91 @@
       line-height: 1.4;
     }
 
-    /* Tiêu đề chính */
     h2 {
       text-align: center;
       color: #d60000;
       margin: 30px 0 20px;
     }
 
-   /* Khu vực mockup */
-.mockup-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;   /* canh giữa theo chiều dọc */
-  width: 100vw;          /* full ngang */
-  height: 100vh;         /* full cao */
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
+    .upload-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-.mockup-container iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  background: white;
-  box-shadow: 0 0 8px rgba(0,0,0,0.2);
-}
+    .upload-section input,
+    .upload-section button {
+      padding: 6px 10px;
+      margin: 4px;
+    }
 
+    .mockup-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 80vh;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    .mockup-container iframe {
+      width: 90%;
+      height: 100%;
+      border: none;
+      background: white;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    }
+
+    #uploadedImage {
+      display: block;
+      margin: 20px auto;
+      max-width: 400px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.15);
+    }
   </style>
 </head>
 <body>
 
   <!-- Header -->
-<div class="header">
-  <!-- Logo công ty -->
-  <img src="logo.png" alt="Logo Công ty" class="logo">
+  <div class="header">
+    <img src="logo.png" alt="Logo Công ty" class="logo">
 
-    <!-- Tên công ty -->
     <div class="company-name">
       CÔNG TY CP BÓNG ĐÈN PHÍCH NƯỚC RẠNG ĐÔNG
     </div>
 
-    <!-- Liên hệ -->
     <div class="contact">
       Đinh Quang Duy: 0904364421 <br>
       Email: duyquang67@gmail.com
     </div>
   </div>
 
-  <!-- Tiêu đề -->
   <h2>Mockup sản phẩm</h2>
 
-  <!-- Nhúng file mockup -->
+  <!-- Khu vực upload -->
+  <div class="upload-section">
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="uploadImage()">Tải ảnh lên Firebase</button>
+    <p id="uploadStatus"></p>
+  </div>
+
+  <!-- Hiển thị ảnh sau khi upload -->
+  <img id="uploadedImage" src="" alt="Ảnh đã upload" style="display:none;">
+
+  <!-- Khu vực mockup -->
   <div class="mockup-container">
     <iframe src="mockup.html"></iframe>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+  <!-- File cấu hình và upload -->
+  <script src="firebase.js"></script>
+  <script src="upload.js"></script>
+
 </body>
 </html>
-
-
-
-
