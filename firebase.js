@@ -1,13 +1,15 @@
-// --- Cấu hình Firebase (thay giá trị thật vào dưới đây) ---
+// --- Cấu hình Firebase ---
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "dán_api_key_vào_đây",
+  authDomain: "dán_authDomain_vào_đây",
+  projectId: "dán_projectId_vào_đây",
+  storageBucket: "dán_storageBucket_vào_đây",
+  messagingSenderId: "dán_senderId_vào_đây",
+  appId: "dán_appId_vào_đây"
 };
 
 // --- Khởi tạo Firebase ---
 firebase.initializeApp(firebaseConfig);
+
+// --- Tham chiếu tới Storage ---
 const storage = firebase.storage();
